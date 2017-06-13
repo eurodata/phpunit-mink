@@ -17,7 +17,6 @@ use aik099\PHPUnit\RemoteCoverage\RemoteCoverageHelper;
 use aik099\PHPUnit\RemoteCoverage\RemoteCoverageTool;
 use aik099\PHPUnit\Event\TestEndedEvent;
 use aik099\PHPUnit\Event\TestEvent;
-use aik099\PHPUnit\Event\TestFailedEvent;
 use aik099\PHPUnit\Session\ISessionStrategy;
 use aik099\PHPUnit\Session\SessionStrategyManager;
 use aik099\PHPUnit\TestSuite\RegularTestSuite;
@@ -30,14 +29,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  *
  * @method \Mockery\Expectation shouldReceive(string $name)
  */
-abstract class BrowserTestCase extends \PHPUnit_Framework_TestCase implements IEventDispatcherAware
+abstract class BrowserTestCase extends BrowserUnsupportedTestCase implements IEventDispatcherAware
 {
 
 	const TEST_ENDED_EVENT = 'test.ended';
 
 	const TEST_SUITE_ENDED_EVENT = 'test_suite.ended';
-
-	const TEST_FAILED_EVENT = 'test.failed';
 
 	const TEST_SETUP_EVENT = 'test.setup';
 
@@ -410,23 +407,6 @@ abstract class BrowserTestCase extends \PHPUnit_Framework_TestCase implements IE
 		$application = Application::getInstance();
 
 		return $application->getTestSuiteFactory()->createSuiteFromTestCase($class_name);
-	}
-
-	/**
-	 * This method is called when a test method did not execute successfully.
-	 *
-	 * @param \Exception $e Exception.
-	 *
-	 * @return void
-	 */
-	protected function onNotSuccessfulTest(\Exception $e)
-	{
-		$this->_eventDispatcher->dispatch(
-			self::TEST_FAILED_EVENT,
-			new TestFailedEvent($e, $this, $this->_session)
-		);
-
-		parent::onNotSuccessfulTest($e);
 	}
 
 	/**
